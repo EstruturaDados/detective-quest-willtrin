@@ -1,47 +1,105 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-// Desafio Detective Quest
-// Tema 4 - Árvores e Tabela Hash
-// Este código inicial serve como base para o desenvolvimento das estruturas de navegação, pistas e suspeitos.
-// Use as instruções de cada região para desenvolver o sistema completo com árvore binária, árvore de busca e tabela hash.
+// Estrutura do nó (cômodo da mansão)
+typedef struct Comodo {
+    char nome[30];
+    struct Comodo *esquerda;  // saída à esquerda
+    struct Comodo *direita;   // saída à direita
+} Comodo;
 
-int main() {
-
-    // 🌱 Nível Novato: Mapa da Mansão com Árvore Binária
-    //
-    // - Crie uma struct Sala com nome, e dois ponteiros: esquerda e direita.
-    // - Use funções como criarSala(), conectarSalas() e explorarSalas().
-    // - A árvore pode ser fixa: Hall de Entrada, Biblioteca, Cozinha, Sótão etc.
-    // - O jogador deve poder explorar indo à esquerda (e) ou à direita (d).
-    // - Finalize a exploração com uma opção de saída (s).
-    // - Exiba o nome da sala a cada movimento.
-    // - Use recursão ou laços para caminhar pela árvore.
-    // - Nenhuma inserção dinâmica é necessária neste nível.
-
-    // 🔍 Nível Aventureiro: Armazenamento de Pistas com Árvore de Busca
-    //
-    // - Crie uma struct Pista com campo texto (string).
-    // - Crie uma árvore binária de busca (BST) para inserir as pistas coletadas.
-    // - Ao visitar salas específicas, adicione pistas automaticamente com inserirBST().
-    // - Implemente uma função para exibir as pistas em ordem alfabética (emOrdem()).
-    // - Utilize alocação dinâmica e comparação de strings (strcmp) para organizar.
-    // - Não precisa remover ou balancear a árvore.
-    // - Use funções para modularizar: inserirPista(), listarPistas().
-    // - A árvore de pistas deve ser exibida quando o jogador quiser revisar evidências.
-
-    // 🧠 Nível Mestre: Relacionamento de Pistas com Suspeitos via Hash
-    //
-    // - Crie uma struct Suspeito contendo nome e lista de pistas associadas.
-    // - Crie uma tabela hash (ex: array de ponteiros para listas encadeadas).
-    // - A chave pode ser o nome do suspeito ou derivada das pistas.
-    // - Implemente uma função inserirHash(pista, suspeito) para registrar relações.
-    // - Crie uma função para mostrar todos os suspeitos e suas respectivas pistas.
-    // - Adicione um contador para saber qual suspeito foi mais citado.
-    // - Exiba ao final o “suspeito mais provável” baseado nas pistas coletadas.
-    // - Para hashing simples, pode usar soma dos valores ASCII do nome ou primeira letra.
-    // - Em caso de colisão, use lista encadeada para tratar.
-    // - Modularize com funções como inicializarHash(), buscarSuspeito(), listarAssociacoes().
-
-    return 0;
+// Função para criar um novo cômodo
+Comodo* criarComodo(const char *nome) {
+    Comodo *novo = (Comodo*)malloc(sizeof(Comodo));
+    strcpy(novo->nome, nome);
+    novo->esquerda = NULL;
+    novo->direita = NULL;
+    return novo;
 }
 
+// Função para montar automaticamente a mansão (árvore binária)
+Comodo* montarMansao() {
+    // Cria os cômodos
+    Comodo *hall = criarComodo("Hall Principal");
+    Comodo *sala = criarComodo("Sala de Estar");
+    Comodo *cozinha = criarComodo("Cozinha");
+    Comodo *biblioteca = criarComodo("Biblioteca");
+    Comodo *quarto = criarComodo("Quarto do Andar Superior");
+    Comodo *banheiro = criarComodo("Banheiro");
+    Comodo *porao = criarComodo("Porao Escuro");
+
+    // Ligações da árvore (estrutura da mansão)
+    hall->esquerda = sala;
+    hall->direita = cozinha;
+
+    sala->esquerda = biblioteca;
+    sala->direita = quarto;
+
+    cozinha->esquerda = banheiro;
+    cozinha->direita = porao;
+
+    // Retorna o início (raiz)
+    return hall;
+}
+
+// Função de exploração do mapa
+void explorarMansao(Comodo *atual) {
+    char escolha;
+
+    while (1) {
+        printf("\nVocê está em:  %s\n", atual->nome);
+
+        // Verifica se é um cômodo sem saídas
+        if (atual->esquerda == NULL && atual->direita == NULL) {
+            printf(" Este cômodo não tem mais saídas. Você chegou ao fim do mapa!\n");
+            break;
+        }
+
+        // Mostra opções disponíveis
+        if (atual->esquerda != NULL)
+            printf("A - Ir para a esquerda (%s)\n", atual->esquerda->nome);
+        if (atual->direita != NULL)
+            printf("D - Ir para a direita (%s)\n", atual->direita->nome);
+        printf("S - Sair da mansão\n");
+
+        printf("Escolha uma direção: ");
+        scanf(" %c", &escolha);
+
+        if ((escolha == 'A' || escolha == 'a') && atual->esquerda != NULL) {
+            atual = atual->esquerda;
+        } 
+        else if ((escolha == 'D' || escolha == 'd') && atual->direita != NULL) {
+            atual = atual->direita;
+        } 
+        else if (escolha == 'S' || escolha == 's') {
+            printf(" Você saiu da mansão em segurança.\n");
+            break;
+        } 
+        else {
+            printf(" Caminho inválido. Tente novamente.\n");
+        }
+    }
+}
+
+// Função para liberar memória
+void liberarMansao(Comodo *raiz) {
+    if (raiz == NULL) return;
+    liberarMansao(raiz->esquerda);
+    liberarMansao(raiz->direita);
+    free(raiz);
+}
+
+// Programa principal
+int main() {
+    printf(" Bem-vindo ao Mapa da Mansão Misteriosa!\n");
+    printf("Você poderá explorar os cômodos usando as direções A (esquerda) e D (direita).\n");
+
+    Comodo *mansao = montarMansao();
+
+    explorarMansao(mansao);
+
+    liberarMansao(mansao);
+    printf("Memória liberada e programa encerrado.\n");
+    return 0;
+}
