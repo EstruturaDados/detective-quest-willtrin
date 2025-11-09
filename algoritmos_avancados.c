@@ -48,7 +48,7 @@ void explorarMansao(Comodo *atual) {
     char escolha;
 
     while (1) {
-        printf("\nVocê está em:  %s\n", atual->nome);
+        printf("\nVocê está em: %s\n", atual->nome);
 
         // Verifica se é um cômodo sem saídas
         if (atual->esquerda == NULL && atual->direita == NULL) {
@@ -77,7 +77,7 @@ void explorarMansao(Comodo *atual) {
             break;
         } 
         else {
-            printf(" Caminho inválido. Tente novamente.\n");
+            printf("Caminho inválido. Tente novamente.\n");
         }
     }
 }
